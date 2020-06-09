@@ -62,7 +62,7 @@ public class UserController {
 	ResponseEntity<Integer> addUser(@RequestBody Users user) {
 		ResponseEntity<Integer> response = null;
 		if (StringUtils.isEmpty(user.getFirstName()) || StringUtils.isEmpty(user.getLastName())) {
-			response = new ResponseEntity<Integer>(HttpStatus.NOT_FOUND);
+			response = new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
 			return response;
 		}
 		response = userService.addUser(user);
