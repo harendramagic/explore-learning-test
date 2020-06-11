@@ -1,10 +1,13 @@
 package com.magic.app.controller;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
@@ -40,6 +43,8 @@ public class UserControllerTest {
 	@MockBean
 	private UserRepository mockUserRepository;
 
+	ObjectMapper objectMapper = new ObjectMapper();
+
 	Users user = new Users(1, "First", "Last");
 
 	@Test
@@ -66,11 +71,11 @@ public class UserControllerTest {
 
 	@Test
 	public void testGetUser_Ok() throws Exception {
-		when(mockUserService.getUser(1)).thenReturn(user);
+		when(mockUserService.getUser(Mockito.anyInt())).thenReturn(user);
 		mvc.perform(MockMvcRequestBuilders.get("/api/user/1").header("Authorization", basicUserAuth(true)))
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
-		verify(mockUserService, times(1)).getUser(1);
+		verify(mockUserService, times(1)).getUser(Mockito.anyInt());
 	}
 
 	@Test
@@ -87,18 +92,20 @@ public class UserControllerTest {
 	@Test
 	public void testDeleteUser_NotFound() throws Exception {
 		when(mockUserService.isUserExist(1)).thenReturn(false);
+
 		mvc.perform(MockMvcRequestBuilders.delete("/api/user/1").header("Authorization", basicUserAuth(false)))
 				.andExpect(status().isNotFound());
 	}
 
 	@Test
 	public void testDeleteUser_Ok() throws Exception {
-		when(mockUserService.isUserExist(1)).thenReturn(true);
-		doNothing().when(mockUserService).deleteUser(1);
+		when(mockUserService.isUserExist(Mockito.anyInt())).thenReturn(true);
+		doNothing().when(mockUserService).deleteUser(Mockito.anyInt());
+
 		mvc.perform(MockMvcRequestBuilders.delete("/api/user/1").header("Authorization", basicUserAuth(false)))
 				.andExpect(status().isOk());
 
-		verify(mockUserService, times(1)).isUserExist(1);
+		verify(mockUserService, times(1)).isUserExist(Mockito.anyInt());
 	}
 
 	@Test
@@ -126,9 +133,9 @@ public class UserControllerTest {
 
 	@Test
 	public void testAddUser_Found() throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
 		when(mockUserService.addUser(Mockito.any())).thenReturn(new ResponseEntity<Integer>(HttpStatus.FOUND));
 		when(mockUserRepository.findByFirstNameAndLastName(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
+
 		mvc.perform(MockMvcRequestBuilders.post("/api/user").content(objectMapper.writeValueAsString(user))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 				.header("Authorization", basicUserAuth(false))).andExpect(status().isFound());
@@ -138,12 +145,13 @@ public class UserControllerTest {
 
 	@Test
 	public void testAddUser_Created() throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
 		when(mockUserService.addUser(Mockito.any()))
 				.thenReturn(new ResponseEntity<Integer>(user.getId(), HttpStatus.CREATED));
+
 		mvc.perform(MockMvcRequestBuilders.post("/api/user").content(objectMapper.writeValueAsString(user))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-				.header("Authorization", basicUserAuth(false))).andExpect(status().isCreated());
+				.header("Authorization", basicUserAuth(false))).andExpect(status().isCreated())
+				.andExpect(jsonPath("$", is(user.getId())));
 
 		verify(mockUserService, times(1)).addUser(Mockito.any());
 	}

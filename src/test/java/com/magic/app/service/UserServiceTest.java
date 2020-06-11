@@ -55,6 +55,7 @@ public class UserServiceTest {
 		List<Users> userList = new ArrayList<Users>();
 		userList.add(user);
 		when(userRepository.findAll(Sort.by(Direction.ASC, "lastName"))).thenReturn(userList);
+		
 		List<Users> listUsers = userService.getAllUsers();
 		assertEquals(1, listUsers.size());
 
@@ -64,6 +65,7 @@ public class UserServiceTest {
 	@Test
 	public void TestIsUserExist() {
 		when(userRepository.existsById(Mockito.anyInt())).thenReturn(true);
+		
 		boolean isExist = userService.isUserExist(1);
 		assertTrue(isExist);
 
@@ -81,9 +83,11 @@ public class UserServiceTest {
 	public void testAddUser_Created() {
 		Integer id = 1;
 		when(userRepository.save(Mockito.any())).thenReturn(user);
+		
 		ResponseEntity<Integer> response = userService.addUser(user);
 		assertEquals(id, response.getBody());
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		
 		verify(userRepository, times(1)).save(Mockito.any());
 	}
 	
@@ -91,9 +95,11 @@ public class UserServiceTest {
 	public void testAddUser_Found() {
 		Integer id = null;
 		when(userRepository.findByFirstNameAndLastName(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
+		
 		ResponseEntity<Integer> response = userService.addUser(user);
 		assertEquals(id, response.getBody());
 		assertEquals(HttpStatus.FOUND, response.getStatusCode());
+		
 		verify(userRepository, times(1)).findByFirstNameAndLastName(Mockito.anyString(), Mockito.anyString());
 	}
 }
