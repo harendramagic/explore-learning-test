@@ -2,10 +2,10 @@ package com.magic.app.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,7 @@ public class UserServiceTest {
 	}
 
 	@Test
-	public void testAddUserSuccess() {
+	public void testAddUser_Created() {
 		Integer id = 1;
 		when(userRepository.save(Mockito.any())).thenReturn(user);
 		ResponseEntity<Integer> response = userService.addUser(user);
@@ -88,7 +88,7 @@ public class UserServiceTest {
 	}
 	
 	@Test
-	public void testAddUserFailed() {
+	public void testAddUser_Found() {
 		Integer id = null;
 		when(userRepository.findByFirstNameAndLastName(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
 		ResponseEntity<Integer> response = userService.addUser(user);
