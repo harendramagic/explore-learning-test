@@ -39,11 +39,11 @@ public class UserService {
 		ResponseEntity<Integer> response = null;
 		Users objUser = userRepository.findByFirstNameAndLastName(user.getFirstName(), user.getLastName());
 		if (Objects.nonNull(objUser)) {
-			response = new ResponseEntity<Integer>(HttpStatus.FOUND);
+			response = new ResponseEntity<>(HttpStatus.FOUND);
 			return response;
 		}
 		Users users = userRepository.save(user);
-		response = new ResponseEntity<Integer>(users.getId(), HttpStatus.CREATED);
+		response = new ResponseEntity<>(users.getId(), HttpStatus.CREATED);
 		return response;
 	}
 }

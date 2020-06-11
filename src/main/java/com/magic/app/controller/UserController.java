@@ -28,43 +28,43 @@ public class UserController {
 	private UserService userService;
 
 	@GetMapping("/user")
-	ResponseEntity<List<Users>> getAllUsers() {
+	public ResponseEntity<List<Users>> getAllUsers() {
 		ResponseEntity<List<Users>> response = null;
 		List<Users> users = userService.getAllUsers();
-		response = new ResponseEntity<List<Users>>(users, HttpStatus.OK);
+		response = new ResponseEntity<>(users, HttpStatus.OK);
 		return response;
 	}
 
 	@GetMapping("/user/{id}")
-	ResponseEntity<Users> getUser(@PathVariable("id") int id) {
+	public ResponseEntity<Users> getUser(@PathVariable("id") int id) {
 		ResponseEntity<Users> response = null;
 		Users user = userService.getUser(id);
 		if (Objects.nonNull(user)) {
-			response = new ResponseEntity<Users>(user, HttpStatus.OK);
+			response = new ResponseEntity<>(user, HttpStatus.OK);
 		} else {
-			response = new ResponseEntity<Users>(HttpStatus.NOT_FOUND);
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return response;
 	}
 
 	@DeleteMapping("/user/{id}")
-	ResponseEntity<Void> deleteUser(@PathVariable("id") int id) {
+	public ResponseEntity<Void> deleteUser(@PathVariable("id") int id) {
 		ResponseEntity<Void> response = null;
 		boolean userExist = userService.isUserExist(id);
 		if (userExist) {
 			userService.deleteUser(id);
-			response = new ResponseEntity<Void>(HttpStatus.OK);
+			response = new ResponseEntity<>(HttpStatus.OK);
 		} else {
-			response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+			response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		return response;
 	}
 
 	@PostMapping("/user")
-	ResponseEntity<Integer> addUser(@RequestBody Users user) {
+	public ResponseEntity<Integer> addUser(@RequestBody Users user) {
 		ResponseEntity<Integer> response = null;
 		if (StringUtils.isEmpty(user.getFirstName()) || StringUtils.isEmpty(user.getLastName())) {
-			response = new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
+			response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			return response;
 		}
 		response = userService.addUser(user);
