@@ -11,15 +11,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("user").password("{noop}password").roles("USER").and().withUser("admin")
-				.password("{noop}password").roles("USER", "ADMIN");
+		auth.inMemoryAuthentication().withUser("user").password("{noop}password").roles("USER");
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.httpBasic().and().authorizeRequests().antMatchers(HttpMethod.GET, "/api/**").hasRole("USER")
-				.antMatchers(HttpMethod.POST, "/api/user").hasRole("ADMIN")
-				.antMatchers(HttpMethod.DELETE, "/api/user/**").hasRole("ADMIN").and().csrf().disable().formLogin()
+				.antMatchers(HttpMethod.POST, "/api/user").hasRole("USER")
+				.antMatchers(HttpMethod.DELETE, "/api/user/**").hasRole("USER").and().csrf().disable().formLogin()
 				.disable();
 	}
 }
