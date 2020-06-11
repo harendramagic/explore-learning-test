@@ -33,15 +33,15 @@ public class UserControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
-	
+
 	@MockBean
 	private UserService mockUserService;
-	
+
 	@MockBean
 	private UserRepository mockUserRepository;
-	
+
 	Users user = new Users(1, "First", "Last");
-	
+
 	@Test
 	public void testGetAllUsers_Unauthorized() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.get("/api/user")).andExpect(status().isUnauthorized());
@@ -63,73 +63,71 @@ public class UserControllerTest {
 		mvc.perform(MockMvcRequestBuilders.get("/api/user/1").header("Authorization", basicUserAuth(true)))
 				.andExpect(status().isNotFound());
 	}
-	
+
 	@Test
 	public void testGetUser_Ok() throws Exception {
 		when(mockUserService.getUser(1)).thenReturn(user);
 		mvc.perform(MockMvcRequestBuilders.get("/api/user/1").header("Authorization", basicUserAuth(true)))
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk());
-		
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+
 		verify(mockUserService, times(1)).getUser(1);
 	}
-	
+
 	@Test
 	public void testDeleteUser_Unauthorized() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.delete("/api/user/1")).andExpect(status().isUnauthorized());
 	}
-	
+
 	@Test
 	public void testDeleteUser_Forbidden() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.delete("/api/user/1").header("Authorization", basicUserAuth(true)))
 				.andExpect(status().isForbidden());
 	}
-	
+
 	@Test
 	public void testDeleteUser_NotFound() throws Exception {
 		when(mockUserService.isUserExist(1)).thenReturn(false);
 		mvc.perform(MockMvcRequestBuilders.delete("/api/user/1").header("Authorization", basicUserAuth(false)))
 				.andExpect(status().isNotFound());
 	}
-	
+
 	@Test
 	public void testDeleteUser_Ok() throws Exception {
 		when(mockUserService.isUserExist(1)).thenReturn(true);
 		doNothing().when(mockUserService).deleteUser(1);
 		mvc.perform(MockMvcRequestBuilders.delete("/api/user/1").header("Authorization", basicUserAuth(false)))
-		.andExpect(status().isOk());
-		
+				.andExpect(status().isOk());
+
 		verify(mockUserService, times(1)).isUserExist(1);
 	}
-	
+
 	@Test
 	public void testAddUser_Unauthorized() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.post("/api/user")).andExpect(status().isUnauthorized());
 	}
-	
+
 	@Test
 	public void testAddUser_Forbidden() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.post("/api/user").header("Authorization", basicUserAuth(true)))
 				.andExpect(status().isForbidden());
 	}
-	
+
 	@Test
 	public void testAddUser_BadRequest() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.post("/api/user").header("Authorization", basicUserAuth(false)))
 				.andExpect(status().isBadRequest());
 	}
-	
+
 	@Test
 	public void testAddUser_UnsupportedMediaType() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.post("/api/user").content(user.toString())
-				.header("Authorization", basicUserAuth(false))).andExpect(status().isUnsupportedMediaType());
+		mvc.perform(MockMvcRequestBuilders.post("/api/user").content(user.toString()).header("Authorization",
+				basicUserAuth(false))).andExpect(status().isUnsupportedMediaType());
 	}
-	
+
 	@Test
 	public void testAddUser_Found() throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
-		when(mockUserService.addUser(Mockito.any()))
-				.thenReturn(new ResponseEntity<Integer>(HttpStatus.FOUND));
+		when(mockUserService.addUser(Mockito.any())).thenReturn(new ResponseEntity<Integer>(HttpStatus.FOUND));
 		when(mockUserRepository.findByFirstNameAndLastName(Mockito.anyString(), Mockito.anyString())).thenReturn(user);
 		mvc.perform(MockMvcRequestBuilders.post("/api/user").content(objectMapper.writeValueAsString(user))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -137,7 +135,7 @@ public class UserControllerTest {
 
 		verify(mockUserService, times(1)).addUser(Mockito.any());
 	}
-	
+
 	@Test
 	public void testAddUser_Created() throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
